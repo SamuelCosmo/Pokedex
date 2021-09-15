@@ -1,0 +1,22 @@
+#app{
+    background: #000000;
+}
+
+#pokemonList{
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    background: #570000;
+}
+
+#listContainer{
+    width: 20%;
+}
+
+#pokemonImg{
+    width: 50%;
+}
+
+.card{
+    margin: 10%;
+}

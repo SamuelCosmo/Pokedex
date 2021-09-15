@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/Images/PokemonLogo.png">
+    <img alt="Pokemon Logo" src="./assets/Images/PokemonLogo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
@@ -17,6 +17,7 @@ export default {
 </script>
 
 <style>
+@import 'components/style.css';
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
