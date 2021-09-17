@@ -1,24 +1,24 @@
 /* eslint-disable */
-<!--<template>
-  <div>
-    <b-table striped hover :items="pokemonList" @onClick="mostrarVista"></b-table>
-  </div>
-</template>-->
 <template>
+  <!--List of pokemons-->
   <div>
+    <b-form id="search" inline action="#">
+      <b-form-input id="searchBar" v-model="textBar" placeholder="Enter name or number of pokemons."></b-form-input>
+      <b-button type="submit" id="searchButton" variant="light" v-b-modal.modal-1 @click="lookForPokemons()">Search</b-button>
+    </b-form>
     <b-row id="pokemonList" cols="5">
       <div id="listContainer" v-for="(pokemon, index) in pokemonList" :key="index">
         <b-card id="cardPokemon" hover  v-b-modal.modal-1 @click="getPokeInfo(index + 1)">
-          <img id="pokemonImg" :src="imgUrl + (index + 1 + offset) + '.png'"/>
-          <b-card-text>{{index + 1 + offset}}.- {{pokemon.name}}</b-card-text>
+          <img id="pokemonImg" :src="imgUrl + (index + 1) + '.png'"/>
+          <b-card-text>{{index + 1}}.- {{pokemon.name}}</b-card-text>
         </b-card>
       </div>
     </b-row>
-
+    <!--Load Spinner-->
     <div id="loaderSpinner" class="text-center" ref="infinitescrolltrigger">
         <b-spinner variant="primary" label="Text Centered"></b-spinner>
     </div>
-
+    <!--Modal Card Details-->
     <div>
       <b-modal centered title="Pokemon" v-model="showModal" id="modal-1" hide-footer hide-header>
         <b-container>
@@ -62,6 +62,7 @@
   export default {
     data() {
       return {
+        textBar: '',
         offset : 0,
         showModal : false,
         pokemonList: [],
@@ -76,8 +77,10 @@
       }
     },
     created(){
+      //this.findCookie();
       axios.get("https://pokeapi.co/api/v2/pokemon?limit=50&offset=" + this.offset).then((result) => {
         this.pokemonList = result.data.results;
+        //this.setCookieValue();
       });
     },
     mounted(){
@@ -85,7 +88,8 @@
     },
     methods: {
       getPokeInfo(index){
-        axios.get("https://pokeapi.co/api/v2/pokemon/" + (index + this.offset)).then((result) => {
+        this.clearPokeInfo();
+        axios.get("https://pokeapi.co/api/v2/pokemon/" + (index)).then((result) => {
           this.pokeId = result.data.id;
           this.pokeName = result.data.name;
           this.pokeExp = result.data.base_experience;
@@ -93,14 +97,12 @@
           this.pokeWeight = result.data.weight;
           this.pokeTypes = result.data.types;
           this.pokeImg = this.imgUrl + result.data.id + ".png";
-          
-      });
+          });
       },
       getImgPokemon(){
         document.getElementById("pokemonImgInfo").src = this.imgUrl + this.pokeId + ".png";
       },
       scrollTrigger() {
-        console.log("Entre");
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if(entry.intersectionRatio > 0) {
@@ -108,17 +110,54 @@
             }
           });
         });
-
         observer.observe(this.$refs.infinitescrolltrigger);
       },
       addMorePokemons(){
+        if(this.offset == 0)
+          this.offset += 50;
         axios.get("https://pokeapi.co/api/v2/pokemon?limit=50&offset=" + this.offset).then((result) => {
         if(this.pokemonList.length != 0){
-          while(result.data.results.length > 0 && this.pokemonList.length + this.offset < 890){
+          while(result.data.results.length > 0 && this.offset < 898){
             this.pokemonList.push(result.data.results.shift());
+            this.offset += 1;
+            //this.setCookieValue();
+          }
+          
+          if(this.offset>=898){
+            document.getElementById("loaderSpinner").style.display = "none";
           }
         }
         });
+      },
+      lookForPokemons(){
+        this.getPokeInfo(this.textBar);
+      },
+      clearPokeInfo(){
+          this.pokeId = 0;
+          this.pokeName = "None";
+          this.pokeExp = 0;
+          this.pokeHeight = 0;
+          this.pokeWeight = 0;
+          this.pokeTypes = [];
+          this.pokeImg = "";
+      },
+      //Manejo Cookies
+      findCookie(){
+        const exists = document.cookie.split(';').some(function(item) {
+          return item.trim().indexOf('listPokemons=') == 0;
+        });
+        console.log("¿Does the cookie exist? " + exists);
+        if(exists == false){
+          document.cookie = "listPokemons=" + this.pokemonList;
+        } else {
+          const value = document.cookie.split('; ').find(row => row.startsWith('listPokemons=')).split('=')[1];
+          console.log(value);
+          this.pokemonList = value;
+        }
+      },
+      setCookieValue(){
+        document.cookie = "listPokemons=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "listPokemons=" + this.pokemonList;
       }
     }
   }

@@ -7,15 +7,22 @@
 }
 
 #search{
-    max-width: 50%;
+    width: 90%;
     margin-left: auto;
     margin-right: auto;
+    display: inline-block;
 }
 
 #searchBar{
     margin-top: 30px;
     margin-bottom: 30px;
-    font-size: 125%;
+    width: 25%;
+}
+
+#searchButton{
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #1a28a5;
 }
 
 #pokemonList{
